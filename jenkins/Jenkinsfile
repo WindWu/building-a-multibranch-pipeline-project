@@ -1,29 +1,42 @@
+@NonCPS
+def log(String message) {
+  def separator = '========================='
+  echo separator + message + separator
+}
+
 node{
   checkout scm
-	docker.withRegistry('https://registry.cn-shanghai.aliyuncs.com/', 'aliyunDockerRegistry'){
-	  def buildImageTag='bimbox_app_build:latest'
-	  docker.build(buildImageTag,'--file ./jenkins/Dockerfile.build .')
 
+
+	docker.withRegistry('https://registry.cn-shanghai.aliyuncs.com/', 'aliyunDockerRegistry'){
+    // 获取 branch 的 name
+    def branchName = env.BRANCH_NAME
+    log('Working on branch: ' + branchName)
+    // 构建一个docker image，用来进行 build 和 test
+	  def buildImageTag='bimbox_app_build:latest'
+	  docker.build(buildImageTag,'--file ./jenkins/docker-files/build.dockerfile --rm .')
+    // 运行构建好的 image，进行 build 和 test
+    // 注意：需要将当前 jenkins workspace 中的内容通过 volume 映射到代码目录下
 		def buildImage=docker.image(buildImageTag)
 		buildImage.inside('-v $PWD/:/home/node/bimbox') {
 		  stage('Install'){
-            echo '=========================Install packages=============================='
+            log('Installing packages......')
             sh 'pwd'
             sh 'rm -fr ./dist'
             sh 'ls -la .'
             sh 'mkdir -p ./dist/bimbox'            
           }
       stage('Build'){
-        echo '==================================build==================================='
+        log('Building project......')
         sh 'touch ./dist/bimbox/build.test'
         // sh 'cnpm run build'
       }
 		}
 
     stage('Deploy'){
-      echo '==================================deploy=================================='
+      log('Deploying the image......')
       def deployImageTag='registry.cn-shanghai.aliyuncs.com/bimbox/bimserver-bimbox:3.0'
-      def deployImage=docker.build(deployImageTag, '--file ./jenkins/Dockerfile.deploy --rm .')
+      def deployImage=docker.build(deployImageTag, '--file ./jenkins/docker-files/deploy.dockerfile --rm .')
 
       // docker.push(deployImageTag)
       deployImage.inside() {
