@@ -2,9 +2,6 @@ FROM registry.cn-shanghai.aliyuncs.com/bimbox/bimserver-bimbox-node:8
 
 ENV CODE_ROOT /home/node/bimbox
 
-RUN pwd
-RUN ls -la .
-
 # copy files to image
 RUN mkdir -p $CODE_ROOT
 
