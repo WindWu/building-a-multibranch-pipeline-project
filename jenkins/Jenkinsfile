@@ -3,21 +3,21 @@ node{
 	docker.withRegistry('https://registry.cn-shanghai.aliyuncs.com/', 'aliyunDockerRegistry'){
 	  def buildImageTag='bimbox_app_build:latest'
 	  docker.build(buildImageTag,'--file ./jenkins/Dockerfile.build .')
-        sh 'echo $PWD'
-        sh 'mkdir -p $PWD/dist'
-		def buildImage=docker.image(buildImageTag, '$PWD/:/home/node/bimbox/dist')
-		buildImage.inside {
+
+		def buildImage=docker.image(buildImageTag)
+		buildImage.inside('-v $PWD/:/home/node/bimbox') {
 		  stage('Install'){
             echo '=========================Install packages=============================='
-            sh 'mkdir -p dist'
-            sh 'touch dist/build.test'
-            // sh 'cnpm install'
+            sh 'pwd'
+            sh 'rm -fr ./dist'
+            sh 'ls -la .'
+            sh 'mkdir -p ./dist'            
           }
-          stage('Build'){
-            echo '==================================build==================================='
-            sh 'touch ./dist/build.test'
-            // sh 'cnpm run build'
-          }
+      stage('Build'){
+        echo '==================================build==================================='
+        sh 'touch ./dist/build.test'
+        // sh 'cnpm run build'
+      }
 		}
 
     stage('Deploy'){
@@ -26,11 +26,11 @@ node{
       def deployImage=docker.build(deployImageTag, '--file ./jenkins/Dockerfile.deploy --rm .')
 
       // docker.push(deployImageTag)
-      deployImage.inside {
+      deployImage.inside() {
         sh 'pwd'
         sh 'ls -la ./dist'
         sh 'ls -la .'
       }
     }
 	}
-} 
+}

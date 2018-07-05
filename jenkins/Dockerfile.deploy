@@ -1,4 +1,7 @@
 FROM registry.cn-shanghai.aliyuncs.com/bimbox/bimserver-bimbox-base:3.0
 
 # copy packages in local dist folder to the dist folder in image
+RUN pwd
+RUN ls -la .
+
 COPY ./dist $BIMBOX_DIST_ROOT
