@@ -11,11 +11,11 @@ node{
             sh 'pwd'
             sh 'rm -fr ./dist'
             sh 'ls -la .'
-            sh 'mkdir -p ./dist'            
+            sh 'mkdir -p ./dist/bimbox'            
           }
       stage('Build'){
         echo '==================================build==================================='
-        sh 'touch ./dist/build.test'
+        sh 'touch ./dist/bimbox/build.test'
         // sh 'cnpm run build'
       }
 		}
