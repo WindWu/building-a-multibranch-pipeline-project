@@ -4,7 +4,7 @@ node{
 	  def buildImageTag='bimbox_app_build:latest'
 	  docker.build(buildImageTag,'--file ./jenkins/Dockerfile.build .')
         sh 'echo $PWD'
-        shd 'mkdir -p $PWD/dist'
+        sh 'mkdir -p $PWD/dist'
 		def buildImage=docker.image(buildImageTag, '$PWD/:/home/node/bimbox/dist')
 		buildImage.inside {
 		  stage('Install'){
